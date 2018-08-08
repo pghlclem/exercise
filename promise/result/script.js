@@ -11,7 +11,7 @@ function loadImage(url) {
     };
 
     img.onerror = function(e) {
-      reject(e);
+      resolve(null);
     };
 
     img.src = url;
@@ -30,6 +30,35 @@ function animate(element, duration, x, y) {
   return new Promise(function(resolve) {
     TweenLite.to(element, duration, { x: x, y: y, onComplete: resolve });
   });
+}
+
+/**
+ *
+ * @param element
+ * @return {Promise<any>}
+ */
+function appendElement(element, container = document.body) {
+  container.appendChild(element);
+  return Promise.resolve(element);
+}
+
+function removeElement(element) {
+  if (element.parentElement) {
+    const parent = element.parentElement;
+    parent.removeChild(element);
+  }
+  return Promise.resolve(element);
+}
+
+function animatePositions(element, duration, positions) {
+  return positions
+  	.reduce(
+  		(prom, position) =>
+  			prom.then(() => animate(element, duration, position.x, position.y)),
+  		Promise.resolve()
+  	)
+  	.then(() => element);
+
 }
 
 var images = [
@@ -60,11 +89,29 @@ var images = [
   "./assets/025-happy.png"
 ];
 
+var positions = [
+  { x: 1, y: 0 },
+  { x: 1, y: 1 },
+  { x: 0, y: 1 },
+  { x: 0, y: 0 }
+];
+
+positions = positions.map(position => ({
+  x: position.x * window.innerWidth / 2,
+  y: position.y * window.innerHeight / 2
+}));
+
 /// WRITE CODE UNDER HERE
-
-var arr = [];
-images.forEach(img => arr.push(loadImage(img)));
-
-Promise.all(arr).then(images => {
-
-})
+Promise.all(images.map(loadImage))
+  .then(images =>
+    images.reduce(
+      (prom, image) =>
+        prom.then(() =>
+          appendElement(image)
+            .then(image => animatePositions(image, 1, positions))
+            .then(image => removeElement(image))
+        ),
+      Promise.resolve()
+    )
+  )
+  .then(() => alert("DONE"));
