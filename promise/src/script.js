@@ -61,10 +61,47 @@ var images = [
 ];
 
 /// WRITE CODE UNDER HERE
-
 var arr = [];
+var arrElements = [];
+var className = "part";
+var dur = 0.2;
+var pos = [{x:600, y:0}, {x:600, y:600}, {x:0, y:600}, {x:0, y:0}];
+var posIndex = 0;
+var elementIndex = 0;
+
 images.forEach(img => arr.push(loadImage(img)));
 
 Promise.all(arr).then(images => {
-
+    images.forEach(img => arrElements.push(placeElement(img)));
+    TweenLite.set(arrElements[0], {display:"block"});
+    animateElement();
 })
+
+function placeElement(img) {
+  img.className = "part";
+  document.body.appendChild(img)
+  return img;
+}
+
+function animateElement() {
+  if(posIndex == pos.length) {
+      TweenLite.set(arrElements[elementIndex], {display:"none"});
+    if(elementIndex < arrElements.length-1) {
+      elementIndex++;
+    } else {
+      elementIndex = 0;
+    }
+    TweenLite.set(arrElements[elementIndex], {display:"block"});
+    posIndex = 0;
+  }
+
+  animate(arrElements[elementIndex], dur, pos[0].x, pos[0].y).then(animateElement)
+  updatePosition();
+  posIndex++;
+}
+
+function updatePosition() {
+  var p = pos.shift();
+  pos.push(p);
+  return pos;
+}

@@ -1,0 +1,21 @@
+html {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%; }
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  user-select: none; }
+
+body {
+  background-color: #FFF;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; }
+
+.part {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none; }
